@@ -32,11 +32,14 @@ function showRandomQuote() {
     quoteCategory.textContent = `Category: ${quote.category}`;
     quoteCategory.style.fontStyle = 'italic';
     quoteDisplay.appendChild(quoteCategory);
+
+    // Save last viewed quote to session storage
+    sessionStorage.setItem('lastViewedQuote', JSON.stringify(quote));
 }
 
 // Create the add quote form
 function createAddQuoteForm() {
-    const formDiv = document.createElement('div');
+    const formDiv = document.getElementById('addQuoteForm');
 
     const quoteInput = document.createElement('input');
     quoteInput.id = 'newQuoteText';
@@ -54,8 +57,6 @@ function createAddQuoteForm() {
     addButton.textContent = 'Add Quote';
     addButton.onclick = addQuote;
     formDiv.appendChild(addButton);
-
-    document.body.appendChild(formDiv);
 }
 
 // Add a new quote
@@ -98,10 +99,29 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
 }
 
+// Load last viewed quote from session storage
+function loadLastViewedQuote() {
+    const lastViewedQuote = sessionStorage.getItem('lastViewedQuote');
+    if (lastViewedQuote) {
+        const quote = JSON.parse(lastViewedQuote);
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        quoteDisplay.innerHTML = ''; // Clear previous quote
+
+        const quoteText = document.createElement('p');
+        quoteText.textContent = quote.text;
+        quoteDisplay.appendChild(quoteText);
+
+        const quoteCategory = document.createElement('p');
+        quoteCategory.textContent = `Category: ${quote.category}`;
+        quoteCategory.style.fontStyle = 'italic';
+        quoteDisplay.appendChild(quoteCategory);
+    }
+}
+
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 window.onload = function() {
     loadQuotes();
-    showRandomQuote();
     createAddQuoteForm();
+    loadLastViewedQuote();
 };
