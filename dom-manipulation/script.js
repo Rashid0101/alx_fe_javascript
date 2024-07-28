@@ -202,9 +202,18 @@ async function syncQuotesWithServer() {
         saveQuotes();
         populateCategories();
         filterQuotes();
-        document.getElementById('notification').textContent = 'New quotes synced from server!';
-        document.getElementById('notification').style.display = 'block';
+        displayNotification('Quotes synced with server!');
     }
+}
+
+// Display a notification
+function displayNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 5000); // Hide notification after 5 seconds
 }
 
 // Periodically sync data with server
