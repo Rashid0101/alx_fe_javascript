@@ -157,6 +157,37 @@ function loadSelectedCategory() {
     }
 }
 
+// Fetch quotes from server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+        const serverQuotes = await response.json();
+        return serverQuotes.map(quote => ({ text: quote.title, category: "Server" }));
+    } catch (error) {
+        console.error('Error fetching quotes from server:', error);
+        return [];
+    }
+}
+
+// Sync quotes with server
+async function syncQuotesWithServer() {
+    const serverQuotes = await fetchQuotesFromServer();
+    const localQuotesSet = new Set(quotes.map(quote => quote.text));
+    const newServerQuotes = serverQuotes.filter(quote => !localQuotesSet.has(quote.text));
+
+    if (newServerQuotes.length > 0) {
+        quotes.push(...newServerQuotes);
+        saveQuotes();
+        populateCategories();
+        filterQuotes();
+        document.getElementById('notification').textContent = 'New quotes synced from server!';
+        document.getElementById('notification').style.display = 'block';
+    }
+}
+
+// Periodically sync data with server
+setInterval(syncQuotesWithServer, 60000); // Sync every 60 seconds
+
 document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 window.onload = function() {
@@ -165,4 +196,5 @@ window.onload = function() {
     populateCategories();
     loadLastViewedQuote();
     loadSelectedCategory();
+    syncQuotesWithServer(); // Initial sync on load
 };
